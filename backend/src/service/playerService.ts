@@ -1,4 +1,4 @@
-import { readPlayers, writePlayers, Player } from "../data/playerRepository.js";
+import { readPlayers, writePlayers, Player } from "../data/playerRepository";
 import { randomUUID } from "node:crypto";
 
 /**
@@ -60,3 +60,10 @@ export const getPlayerByIdService = async (id: string): Promise<Player | null> =
     const players = await readPlayers();
     return players.find(p => p.id === id) || null;
 };
+
+export const getPlayersService = async () => {
+  // Aquí llamas a la función 'readPlayers' que ya tienes en el Repository
+  const players = await readPlayers(); 
+  return players;
+};
+

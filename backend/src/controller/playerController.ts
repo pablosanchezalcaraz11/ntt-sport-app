@@ -1,5 +1,14 @@
 import { Request, Response } from "express";
-import { addTrophyToPlayerService, createPlayerService,  getPlayerByIdService } from "../service/playerService";
+import { addTrophyToPlayerService, createPlayerService, getPlayerByIdService, getPlayersService } from "../service/playerService";
+const getPlayers = async (req: Request, res: Response) => {
+  try {
+    // Llamamos al servicio para que traiga los datos del JSON
+    const players = await getPlayersService(); 
+    res.json(players);
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 const createPlayer = async (req: Request, res: Response) => {
     try {
@@ -33,23 +42,22 @@ const addTrophy = async (req: Request, res: Response) => {
 };
 
 const getPlayerById = async (req: Request, res: Response) => {
-    try {
-       // Cambia la línea 37 por esta:
-const { playerId } = req.params as any;
-        const player = await getPlayerByIdService(playerId);
-
-        if (player) {
-            res.json(player);
-        } else {
-            res.status(404).json({ message: "Jugador no encontrado" });
-        }
-    } catch (error: any) {
-        res.status(500).json({ message: error.message });
+  try {
+    const { playerId } = req.params;
+    const player = await getPlayerByIdService(playerId as any);
+    
+    if (!player) {
+      return res.status(404).json({ message: "Jugador no encontrado" });
     }
+    
+    res.json(player);
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
 };
-
 export {
     createPlayer,
     addTrophy,
-    getPlayerById
+    getPlayerById,
+    getPlayers
 };

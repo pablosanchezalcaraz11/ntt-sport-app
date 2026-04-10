@@ -17,24 +17,26 @@ type Player = {
 };
 
 // 2. Configuración de rutas (Mismo estilo que tu imagen)
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const dataPath = path.join(__dirname, "players.json");
+
+const dataPath = path.resolve(__dirname, "../../src/data/players.json");
+console.log("🔍 Buscando datos en:", dataPath);
 
 // 3. Función para leer (Asíncrona con promesas)
+// backend/src/data/playerRepository.ts
+
 async function readPlayers(): Promise<Player[]> {
   try {
+    console.log("📂 Intentando leer desde:", dataPath); // Chivato 1
     const raw = await fs.readFile(dataPath, "utf-8");
+    
+    console.log("📄 Contenido bruto:", raw); // Chivato 2
     return JSON.parse(raw) as Player[];
-  } catch (error) {
-    const err = error as NodeJS.ErrnoException;
-    if (err.code === "ENOENT") {
-      return []; // Si no existe el archivo, devolvemos array vacío
-    }
-    throw error;
+  } catch (error: any) {
+    // CAMBIO CLAVE: Que nos diga el error real por consola
+    console.error("❌ ERROR EN REPOSITORY:", error.message);
+    return []; 
   }
 }
-
 // 4. Función para escribir
 async function writePlayers(players: Player[]): Promise<void> {
   await fs.writeFile(dataPath, JSON.stringify(players, null, 2), "utf-8");
