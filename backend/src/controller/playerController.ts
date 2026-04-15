@@ -13,7 +13,8 @@ const getPlayers = async (req: Request, res: Response) => {
 const createPlayer = async (req: Request, res: Response) => {
     try {
         // Desestructuramos del body según pide el ejercicio
-        const { nickname, level }: { nickname: string, level: number } = req.body;
+       const { nickname, level } = req.body;
+console.log("Cuerpo recibido:", req.body);
 
         const nuevoPlayer = await createPlayerService(nickname, level);
         res.status(201).json(nuevoPlayer);
