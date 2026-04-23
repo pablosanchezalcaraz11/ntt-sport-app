@@ -1,76 +1,34 @@
 import React, { useState } from 'react';
 
-// Definimos qué necesita este componente para funcionar
-interface PlayerFormProps {
-  onPlayerCreated: () => void;
-}
-
-export default function PlayerForm({ onPlayerCreated }: PlayerFormProps) {
-  // Tipamos los estados
-  const [nickname, setNickname] = useState<string>('');
-  const [level, setLevel] = useState<number>(1);
+export default function PlayerForm({ onPlayerCreated }: { onPlayerCreated: () => void }) {
+  const [nickname, setNickname] = useState('');
+  const [level, setLevel] = useState(1);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("1. Iniciando envío...");
-
-    const newPlayer = { 
-        nickname: nickname, 
-        level: Number(level) // Nos aseguramos de que sea un número
-    };
-
-    console.log("2. Datos a enviar:", newPlayer);
-
-    try {
-        const response = await fetch('http://localhost:3000/api/players', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(newPlayer),
-        });
-
-        console.log("3. Respuesta recibida. Status:", response.status);
-
-        if (response.ok) {
-            console.log("4. ¡Todo OK!");
-            setNickname('');
-            setLevel(1);
-            onPlayerCreated();
-            alert("¡Jugador creado!");
-        } else {
-            const errorText = await response.text();
-            console.error("4. Error del servidor:", errorText);
-            alert("El servidor respondió con error: " + response.status);
-        }
-    } catch (error) {
-        console.error("X. ERROR CRÍTICO DE CONEXIÓN:", error);
-        alert("No se pudo conectar con el servidor. Revisa la consola (F12)");
-    }
-};
+    const game = (document.getElementById('game') as HTMLInputElement)?.value;
+    const tournament = (document.getElementById('tournament') as HTMLInputElement)?.value;
+    
+    await fetch('http://localhost:3000/api/players', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nickname, level, trophies: tournament ? [{ game, tournament }] : [] })
+    });
+    setNickname('');
+    onPlayerCreated();
+  };
 
   return (
-    <form onSubmit={handleSubmit} style={{ padding: '20px', border: '1px solid #444', borderRadius: '8px', marginBottom: '20px' }}>
-      <div style={{ marginBottom: '10px' }}>
-        <label>Nickname: </label>
-        <input 
-          type="text" 
-          value={nickname} 
-          onChange={(e) => setNickname(e.target.value)} 
-          required 
-        />
-      </div>
-      <div style={{ marginBottom: '10px' }}>
-        <label>Nivel: </label>
-        <input 
-          type="number" 
-          value={level} 
-          onChange={(e) => setLevel(Number(e.target.value))} 
-          required 
-        />
-      </div>
-      <button type="submit">Añadir Jugador</button>
+    <form onSubmit={handleSubmit} style={fB}>
+      <h4 style={hS}>NUEVO JUGADOR</h4>
+      <input placeholder="Nickname" value={nickname} onChange={e => setNickname(e.target.value)} required style={iS} />
+      <input type="number" value={level} onChange={e => setLevel(Number(e.target.value))} required style={iS} />
+      <button style={bS}>AÑADIR</button>
     </form>
   );
 }
+
+const fB = { background: '#111', padding: '20px', borderRadius: '12px', border: '1px solid #222' };
+const hS = { fontSize: '0.6rem', color: '#444', marginBottom: '10px' };
+const iS = { width: '100%', padding: '10px', background: '#000', border: '1px solid #333', color: '#fff', borderRadius: '6px', marginBottom: '10px', boxSizing: 'border-box' as 'border-box' };
+const bS = { width: '100%', padding: '10px', background: '#00d4ff', color: '#000', border: 'none', borderRadius: '6px', fontWeight: 'bold' as 'bold', cursor: 'pointer' };
