@@ -5,16 +5,30 @@ import PlayerForm from './components/PlayerForm'
 function App() {
   const [players, setPlayers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const loadPlayers = async () => {
     setLoading(true);
-    try { setPlayers(await getPlayers()); } catch (e) { console.error("Off"); } finally { setLoading(false); }
+    try {
+      setPlayers(await getPlayers());
+    } catch (e) {
+      console.error("Off", e);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("¿Eliminar?")) return;
-    await fetch(`http://localhost:3000/api/players/${id}`, { method: 'DELETE' });
-    setPlayers(players.filter(p => p.id !== id));
+    setDeletingId(id);
+    try {
+      await fetch(`http://localhost:3000/api/players/${id}`, { method: 'DELETE' });
+      setPlayers(players.filter(p => p.id !== id));
+    } catch (e) {
+      console.error('Error deleting player', e);
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   useEffect(() => { loadPlayers(); }, []);
@@ -37,7 +51,11 @@ function App() {
         </aside>
 
         <main style={list}>
-          {loading ? <div className="spinner"></div> : (
+          {loading ? (
+            <div className="spinner"></div>
+          ) : players.length === 0 ? (
+            <div style={empty}>No hay jugadores registrados.</div>
+          ) : (
             players.map(p => (
               <div key={p.id} style={card}>
                 <div style={pInfo}>
@@ -49,7 +67,13 @@ function App() {
                     <div key={i} style={chip}>🏆 {t.game}</div>
                   ))}
                 </div>
-                <button onClick={() => handleDelete(p.id)} style={del}>🗑️</button>
+                <button
+                  onClick={() => handleDelete(p.id)}
+                  style={del}
+                  disabled={deletingId === p.id || loading}
+                >
+                  {deletingId === p.id ? 'Eliminando...' : '🗑️'}
+                </button>
               </div>
             ))
           )}
@@ -77,5 +101,6 @@ const nick = { fontWeight: 'bold' };
 const trBox = { display: 'flex', gap: '8px', flex: 1 };
 const chip = { background: '#1a1a1a', padding: '4px 10px', borderRadius: '15px', fontSize: '0.7rem', border: '1px solid #333' };
 const del = { background: 'none', border: 'none', cursor: 'pointer', opacity: 0.3 };
+const empty = { color: '#aaa', padding: '20px', textAlign: 'center' as const };
 
 export default App;

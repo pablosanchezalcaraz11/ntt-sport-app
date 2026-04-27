@@ -3,27 +3,52 @@ import React, { useState } from 'react';
 export default function PlayerForm({ onPlayerCreated }: { onPlayerCreated: () => void }) {
   const [nickname, setNickname] = useState('');
   const [level, setLevel] = useState(1);
+  const [saving, setSaving] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const game = (document.getElementById('game') as HTMLInputElement)?.value;
     const tournament = (document.getElementById('tournament') as HTMLInputElement)?.value;
-    
-    await fetch('http://localhost:3000/api/players', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nickname, level, trophies: tournament ? [{ game, tournament }] : [] })
-    });
-    setNickname('');
-    onPlayerCreated();
+
+    setSaving(true);
+    try {
+      await fetch('http://localhost:3000/api/players', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nickname, level, trophies: tournament ? [{ game, tournament }] : [] })
+      });
+      setNickname('');
+      onPlayerCreated();
+    } catch (error) {
+      console.error('Error creating player', error);
+      alert('No se pudo añadir el jugador. Intenta de nuevo.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} style={fB}>
       <h4 style={hS}>NUEVO JUGADOR</h4>
-      <input placeholder="Nickname" value={nickname} onChange={e => setNickname(e.target.value)} required style={iS} />
-      <input type="number" value={level} onChange={e => setLevel(Number(e.target.value))} required style={iS} />
-      <button style={bS}>AÑADIR</button>
+      <input
+        placeholder="Nickname"
+        value={nickname}
+        onChange={e => setNickname(e.target.value)}
+        required
+        style={iS}
+        disabled={saving}
+      />
+      <input
+        type="number"
+        value={level}
+        onChange={e => setLevel(Number(e.target.value))}
+        required
+        style={iS}
+        disabled={saving}
+      />
+      <button type="submit" style={bS} disabled={saving}>
+        {saving ? 'Añadiendo...' : 'AÑADIR'}
+      </button>
     </form>
   );
 }
