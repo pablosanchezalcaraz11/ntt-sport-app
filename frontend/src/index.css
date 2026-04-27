@@ -1,0 +1,18 @@
+html, body, #root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: #07090f;
+  color: #fff;
+}
+
+button, input, textarea, select {
+  font: inherit;
+}
+
+::selection {
+  background: rgba(0, 212, 255, 0.25);
+}

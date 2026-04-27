@@ -28,14 +28,14 @@ export default function PlayerForm({ onPlayerCreated }: { onPlayerCreated: () =>
   };
 
   return (
-    <form onSubmit={handleSubmit} style={fB}>
-      <h4 style={hS}>NUEVO JUGADOR</h4>
+    <form onSubmit={handleSubmit} className="player-form">
+      <h4 className="player-form__title">NUEVO JUGADOR</h4>
       <input
         placeholder="Nickname"
         value={nickname}
         onChange={e => setNickname(e.target.value)}
         required
-        style={iS}
+        className="player-form__input"
         disabled={saving}
       />
       <input
@@ -43,17 +43,12 @@ export default function PlayerForm({ onPlayerCreated }: { onPlayerCreated: () =>
         value={level}
         onChange={e => setLevel(Number(e.target.value))}
         required
-        style={iS}
+        className="player-form__input"
         disabled={saving}
       />
-      <button type="submit" style={bS} disabled={saving}>
+      <button type="submit" className="player-form__button" disabled={saving}>
         {saving ? 'Añadiendo...' : 'AÑADIR'}
       </button>
     </form>
   );
 }
-
-const fB = { background: '#111', padding: '20px', borderRadius: '12px', border: '1px solid #222' };
-const hS = { fontSize: '0.6rem', color: '#444', marginBottom: '10px' };
-const iS = { width: '100%', padding: '10px', background: '#000', border: '1px solid #333', color: '#fff', borderRadius: '6px', marginBottom: '10px', boxSizing: 'border-box' as 'border-box' };
-const bS = { width: '100%', padding: '10px', background: '#00d4ff', color: '#000', border: 'none', borderRadius: '6px', fontWeight: 'bold' as 'bold', cursor: 'pointer' };
